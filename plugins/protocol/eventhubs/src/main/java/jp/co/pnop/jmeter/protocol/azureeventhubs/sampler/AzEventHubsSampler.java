@@ -290,6 +290,7 @@ public class AzEventHubsSampler extends AbstractSampler implements TestStateList
                     ObjectMapper mapper = new ObjectMapper();
                     Map<String, Object> properties = mapper.readValue(customProperties, new TypeReference<Map<String, Object>>(){});
                     eventData.getProperties().putAll(properties);
+                    requestBody = requestBody.concat("\n").concat("Custom properties: ").concat(customProperties);
                 }
 
                 String contentType = msg.getContentType();
