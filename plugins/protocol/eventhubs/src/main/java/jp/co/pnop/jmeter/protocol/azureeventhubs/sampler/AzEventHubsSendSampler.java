@@ -139,7 +139,8 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
             }
             EventDataBatch batch = eventHubProducerClient.createBatch(batchOptions);
 
-            PropertyIterator iter = amqpMessages.iterator();
+            AzAmqpMessages clonedAmqpMessages = (AzAmqpMessages) amqpMessages.clone();
+            PropertyIterator iter = clonedAmqpMessages.iterator();
             int msgCount = 0;
             while (iter.hasNext()) {
                 msgCount++;
@@ -221,7 +222,7 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
         } finally {
             amqpMessages.removeAllMessages();
             setMessages(amqpMessages);
-            
+
             sampleResult.setSamplerData(requestBody); // Request Body
             sampleResult.setBytes(bytes);
             sampleResult.setSentBytes(sentBytes);
