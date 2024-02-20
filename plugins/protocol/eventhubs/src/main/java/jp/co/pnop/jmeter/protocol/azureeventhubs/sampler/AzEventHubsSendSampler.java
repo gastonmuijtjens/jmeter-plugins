@@ -92,15 +92,16 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
         EventHubProducerClient eventHubProducerClient = null;
         EventHubClientBuilder eventHubProducerClientBuilder = new EventHubClientBuilder();
 
-        try {
-            sampleResult.sampleStart(); // Start timing
+        // Verify if any messages are configured
+        AzAmqpMessages amqpMessages = getMessages();
 
-            // Verify if any messages are configured
-            AzAmqpMessages amqpMessages = getMessages();
+        try {
             if (amqpMessages == null) {
                 throw new Exception(
                         "No AMQP messages have been found. Make sure to use the Event Hubs Message Add sampler first.");
             }
+
+            sampleResult.sampleStart(); // Start timing
 
             requestBody = "Endpoint: sb://".concat(getNamespaceName()).concat("\n")
                     .concat("Event Hub: ").concat(getEventHubName());
@@ -201,7 +202,6 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
             responseMessage = "OK";
             isSuccessful = true;
             sampleResult.sampleEnd(); // End timing
-            clearMessages();
         } catch (AmqpException ex) {
             logger.error("Error calling {} sampler. ", threadName, ex);
             if (ex.isTransient()) {
@@ -219,6 +219,9 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
             responseMessage = ex.getMessage();
             logger.error("Error calling {} sampler. ", threadName, ex);
         } finally {
+            amqpMessages.removeAllMessages();
+            setMessages(amqpMessages);
+            
             sampleResult.setSamplerData(requestBody); // Request Body
             sampleResult.setBytes(bytes);
             sampleResult.setSentBytes(sentBytes);
@@ -329,11 +332,5 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
     private AzAmqpMessages getMessages() {
         AzAmqpMessages amqpMessages = (AzAmqpMessages) vars.getObject(MESSAGES);
         return amqpMessages;
-    }
-
-    private void clearMessages() {
-        AzAmqpMessages amqpMessages = getMessages();
-        amqpMessages.clear();
-        setMessages(amqpMessages);
     }
 }
