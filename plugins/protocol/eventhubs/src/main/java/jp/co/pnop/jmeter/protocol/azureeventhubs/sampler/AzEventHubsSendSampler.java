@@ -139,8 +139,7 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
             }
             EventDataBatch batch = eventHubProducerClient.createBatch(batchOptions);
 
-            AzAmqpMessages clonedAmqpMessages = (AzAmqpMessages) amqpMessages.clone();
-            PropertyIterator iter = clonedAmqpMessages.iterator();
+            PropertyIterator iter = amqpMessages.iterator();
             int msgCount = 0;
             while (iter.hasNext()) {
                 msgCount++;
