@@ -66,8 +66,6 @@ public class AzEventHubsPrepareSampler extends AbstractSampler implements TestSt
 
     private static AtomicInteger classCount = new AtomicInteger(0); // keep track of classes created
 
-    private JMeterVariables vars = JMeterContextService.getContext().getVariables();
-
     public AzEventHubsPrepareSampler() {
         super();
         classCount.incrementAndGet();
@@ -165,11 +163,11 @@ public class AzEventHubsPrepareSampler extends AbstractSampler implements TestSt
     }
 
     private void setMessages(AzAmqpMessages amqpMessages) {
-        vars.putObject(MESSAGES, amqpMessages);
+        getThreadContext().getVariables().putObject(MESSAGES, amqpMessages);
     }
 
     private AzAmqpMessages getMessages() {
-        AzAmqpMessages amqpMessages = (AzAmqpMessages) vars.getObject(MESSAGES);
+        AzAmqpMessages amqpMessages = (AzAmqpMessages) getThreadContext().getVariables().getObject(MESSAGES);
         return amqpMessages;
     }
 }

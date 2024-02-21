@@ -74,10 +74,9 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
     public static final String PARTITION_TYPE_ID = "ID";
     public static final String PARTITION_TYPE_KEY = "Key";
 
-    private JMeterVariables vars = JMeterContextService.getContext().getVariables();
-
     @Override
     public SampleResult sample(Entry e) {
+
         boolean isSuccessful = false;
 
         SampleResult sampleResult = new SampleResult();
@@ -219,9 +218,7 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
             responseMessage = ex.getMessage();
             logger.error("Error calling {} sampler. ", threadName, ex);
         } finally {
-            amqpMessages.removeAllMessages();
-            setMessages(amqpMessages);
-
+            setMessages(new AzAmqpMessages());
             sampleResult.setSamplerData(requestBody); // Request Body
             sampleResult.setBytes(bytes);
             sampleResult.setSentBytes(sentBytes);
@@ -326,11 +323,11 @@ public class AzEventHubsSendSampler extends AbstractSampler implements TestState
     }
 
     private void setMessages(AzAmqpMessages amqpMessages) {
-        vars.putObject(MESSAGES, amqpMessages);
+        getThreadContext().getVariables().putObject(MESSAGES, amqpMessages);
     }
 
     private AzAmqpMessages getMessages() {
-        AzAmqpMessages amqpMessages = (AzAmqpMessages) vars.getObject(MESSAGES);
+        AzAmqpMessages amqpMessages = (AzAmqpMessages) getThreadContext().getVariables().getObject(MESSAGES);
         return amqpMessages;
     }
 }
